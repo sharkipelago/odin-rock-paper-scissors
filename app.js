@@ -1,3 +1,16 @@
+const roundResult = document.querySelector("#round-result");
+const computerChoice = document.querySelector("#computer-choice");
+const runningScore = document.querySelector("#running-score");
+const finalResult = document.querySelector("#final-result");
+
+const buttons = document.querySelectorAll(".choice");
+buttons.forEach(btn => btn.addEventListener("click", onChoiceClick));
+
+
+let playerWins = 0;
+let comWins = 0;
+let draws = 0;
+
 function computerPlay(){
     
     let comChoice = Math.floor(Math.random() * 3);
@@ -14,12 +27,12 @@ function computerPlay(){
 function playRound(playerSelection, computerSelection){
     playerSelection = playerSelection.charAt(0).toUpperCase() + playerSelection.slice(1).toLowerCase();
 
-    console.log(`Computer chose ${computerSelection}`);
+    updateResults(computerChoice, `Computer chose ${computerSelection}`)
     
     let playerWon = null;
 
     if (playerSelection === computerSelection){
-        console.log("It's a draw");
+        updateResults(roundResult, "It's a draw")
         return playerWon;
     }
     else if (playerSelection === "Rock"){
@@ -43,38 +56,33 @@ function playRound(playerSelection, computerSelection){
 
     let first = (playerWon)? playerSelection : computerSelection;
     let second = (playerWon)? computerSelection: playerSelection;
-    console.log(`You ${(playerWon)?"Won":"Lose"}! ${first} beats ${second}`);
+    updateResults(roundResult, `You ${(playerWon)?"Won":"Lose"}! ${first} beats ${second}`)
     return playerWon;
 }
 
-function game(){
-    let playerWins = 0;
-    let comWins = 0;
-    let draws = 0;
+function triggerGameOver(){
+    finalResult.innerText = (playerWins > comWins) ? "===You Win!===" : "===Computer Wins!===";
+}
 
+function updateResults(element, message){
+    element.innerText = message;
+}
 
-    for (let i = 0; i < 5; i++) {
-        let input = prompt("Chose rock, paper or scissors");
-        let result = playRound(input, computerPlay());
-        if (result === null)
-            draws++;
-        else
-            (result)? playerWins++: comWins++;
+function updateScore(result){
 
-        console.log(`The score is ${playerWins} - ${comWins} - ${draws}`);
-        
-        if (playerWins > 2 || comWins > 2){
-            break;
-        } 
+    if (result === null)
+        draws++;
+    else
+        (result)? playerWins++: comWins++;
+
+    runningScore.innerText = `Player: ${playerWins} - Com: ${comWins} - Draws: ${draws}`;
+    
+    if (playerWins > 4 || comWins > 4){
+        triggerGameOver();
     }
+}
 
-    if (playerWins > comWins)
-        console.log("===You Win!===");
-    else if (comWins > playerWins){
-        console.log("===Computer Wins!===")
-    }
-    else {
-        console.log("===It's a draw!===");
-    }
-
+function onChoiceClick(e){
+    result = playRound(e.target.getAttribute("value"),computerPlay())
+    updateScore(result)
 }
